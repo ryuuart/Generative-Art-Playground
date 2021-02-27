@@ -14,9 +14,12 @@
 /* Generic */
 /* Any reset or normalization goes here. Setting the CSS settings. */
 @import "normalize.css";
+@import "generics.reset.css";
 
 /* Elements */
 /* Any raw HTML element are styled here */
+@import "elements.page.css";
+@import "elements.canvas.css";
 
 /* Objects */
 /* Any specific object or shared component in the HTML

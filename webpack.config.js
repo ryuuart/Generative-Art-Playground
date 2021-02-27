@@ -1,3 +1,4 @@
+const copyWebpackPlugin = require('copy-webpack-plugin')
 const path = require('path')
 
 module.exports = {
@@ -9,9 +10,26 @@ module.exports = {
     devServer: {
         contentBase: './dist',
         port: 9000,
+        writeToDisk: true,
     },
+    module: {
+        rules: [
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
+            }
+        ]
+    },
+    plugins: [
+        new copyWebpackPlugin({
+            patterns: [
+                { from: "./src/Art Scripts/", to: "./Art Scripts" },
+                { from: "./styles/", to: "./styles"},
+            ]
+        })
+    ],
     output: {
-        filename: '[name].bundle.js',
+        filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
     }
 }
