@@ -27,6 +27,7 @@
     "wepack-cli": "^0.0.1-security"
   },
   "dependencies": {
+    "dat.gui": "^0.7.7",
     "p5": "^1.2.0"
   }
 }

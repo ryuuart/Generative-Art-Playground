@@ -1,11 +1,11 @@
-const copyWebpackPlugin = require('copy-webpack-plugin')
-const path = require('path')
+const copyWebpackPlugin = require('copy-webpack-plugin');
+const path = require('path');
+const glob = require('glob');
+const { parse } = require('path');
 
 module.exports = {
     mode: 'development',
-    entry: {
-        index: './src/index.js'
-    },
+    entry: glob.sync('./src/**/*.js'),
     devtool: 'inline-source-map',
     devServer: {
         contentBase: './dist',
@@ -29,7 +29,7 @@ module.exports = {
         })
     ],
     output: {
-        filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
+        filename: '[name].bundle.js',
     }
 }
