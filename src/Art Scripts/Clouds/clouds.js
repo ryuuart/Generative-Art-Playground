@@ -8,9 +8,15 @@ window.addEventListener('load', function () {
 
     const params = {
         cloudWidth: 10,
+        cloudHeight: 10,
+        gridSize: 4,
+        scale: 1.5,
     }
 
-    gui.add(params, 'cloudWidth');
+    gui.add(params, 'cloudWidth', 0, 50);
+    gui.add(params, 'cloudHeight', 0, 50);
+    gui.add(params, 'scale', 0, 50);
+    gui.add(params, 'gridSize', 0, 50, 1);
 
     const sketch = (p5) => {
         // Create a new canvas to browser size
@@ -33,8 +39,8 @@ window.addEventListener('load', function () {
             // white background
             p5.background(255);
 
-            const gridSize = 4;
-            const innderWidth = p5.width - margin * 2;
+            const gridSize = params.gridSize;
+            const innerWidth = p5.width - margin * 2;
             const scaledGridSize = gridSize * 1.5;
             const cellSize = innerWidth / gridSize;
 
@@ -47,12 +53,20 @@ window.addEventListener('load', function () {
                     const px = p5.lerp(margin, p5.width - margin, u);
                     const py = p5.lerp(margin, p5.height - margin, v);
 
+                    p5.fill(255);
+
                     printCloud({
                         startX: px,
                         startY: py,
-                        amplitude: 50,
-                        length: dim * 0.04
+                        amplitude: 0,
+                        cloudWidth: params.cloudWidth,
+                        cloudHeight: params.cloudHeight,
+                        length: dim * 0.04,
+                        scale: params.scale,
                     });
+
+                    p5.fill(0);
+                    p5.ellipse(px, py, 20, 20);
                 }
             }
 
@@ -64,6 +78,9 @@ window.addEventListener('load', function () {
                 startY,
                 amplitude,
                 length,
+                cloudWidth,
+                cloudHeight,
+                scale
             } = options;
 
             const calcVScale = (x, i, amp) => {
@@ -71,8 +88,8 @@ window.addEventListener('load', function () {
             }
 
             const radius = length;
-            const eHeight = length;
-            const eWidth = length * 1.5;
+            const eHeight = cloudHeight * scale;
+            const eWidth = cloudWidth * scale;
             // Cloud shape
             p5.beginShape();
             for (let i = 0; i < 2 * p5.PI; i += 0.01) {
