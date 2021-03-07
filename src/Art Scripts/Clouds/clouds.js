@@ -13,7 +13,8 @@ window.addEventListener('load', function () {
         gridHeight: 4,
         scale: 1.5,
         amplitude: 1,
-        randomize: true
+        randomize: true,
+        diff: 10,
     }
 
     gui.add(params, 'cloudWidth', 0, 50);
@@ -23,6 +24,9 @@ window.addEventListener('load', function () {
     gui.add(params, 'gridWidth', 0, 50, 1);
     gui.add(params, 'gridHeight', 0, 50, 1);
     gui.add(params, 'randomize');
+
+    const randomizeFolder = gui.addFolder('Randomize Only');
+    randomizeFolder.add(params, 'diff', 0, 100);
 
     const sketch = (p5) => {
         // Create a new canvas to browser size
@@ -90,10 +94,10 @@ window.addEventListener('load', function () {
             }
 
             const calcPosX = startCloud((pos) => {
-                return startX - (scale * amplitude * Math.cos(pos) * p5.noise(Math.cos(pos) + 1, Math.sin(pos) + 1, params.randomize ? startX * p5.noise(startX) : pos));
+                return startX - (scale * amplitude * Math.cos(pos) * p5.noise(Math.cos(pos) + 1, Math.sin(pos) + 1, params.randomize ? startY * params.diff : pos));
             }, eWidth, Math.cos);
             const calcPosY = startCloud((pos) => {
-                return startY - (scale * amplitude * Math.sin(pos) * p5.noise(Math.cos(pos) + 1, Math.sin(pos) + 1, params.randomize ? startY * p5.noise(startY): pos));
+                return startY - (scale * amplitude * Math.sin(pos) * p5.noise(Math.cos(pos) + 1, Math.sin(pos) + 1, params.randomize ? startX * params.diff : pos));
             }, eHeight, Math.sin);
 
             // Cloud shape
