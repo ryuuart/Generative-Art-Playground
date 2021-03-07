@@ -9,14 +9,20 @@ window.addEventListener('load', function () {
     const params = {
         cloudWidth: 10,
         cloudHeight: 10,
-        gridSize: 4,
+        gridWidth: 4,
+        gridHeight: 4,
         scale: 1.5,
+        amplitude: 1,
+        randomize: true
     }
 
     gui.add(params, 'cloudWidth', 0, 50);
     gui.add(params, 'cloudHeight', 0, 50);
+    gui.add(params, 'amplitude', 0, 50);
     gui.add(params, 'scale', 0, 50);
-    gui.add(params, 'gridSize', 0, 50, 1);
+    gui.add(params, 'gridWidth', 0, 50, 1);
+    gui.add(params, 'gridHeight', 0, 50, 1);
+    gui.add(params, 'randomize');
 
     const sketch = (p5) => {
         // Create a new canvas to browser size
@@ -39,34 +45,25 @@ window.addEventListener('load', function () {
             // white background
             p5.background(255);
 
-            const gridSize = params.gridSize;
             const innerWidth = p5.width - margin * 2;
-            const scaledGridSize = gridSize * 1.5;
-            const cellSize = innerWidth / gridSize;
 
-            for (let y = 0; y < gridSize; y += 1) {
-                for (let x = 0; x < gridSize; x += 1) {
+            for (let y = 0; y < params.gridHeight; y += 1) {
+                for (let x = 0; x < params.gridWidth; x += 1) {
                     // for the case where the grid's size is only one, make it all in the middle
-                    const u = gridSize <= 1 ? 0.5 : x / (gridSize - 1);
-                    const v = gridSize <= 1 ? 0.5 : y / (gridSize - 1);
+                    const u = params.gridWidth <= 1 ? 0.5 : x / (params.gridWidth - 1);
+                    const v = params.gridHeight <= 1 ? 0.5 : y / (params.gridHeight - 1);
 
                     const px = p5.lerp(margin, p5.width - margin, u);
                     const py = p5.lerp(margin, p5.height - margin, v);
 
-                    p5.fill(255);
-
                     printCloud({
                         startX: px,
                         startY: py,
-                        amplitude: 0,
+                        amplitude: params.amplitude,
                         cloudWidth: params.cloudWidth,
                         cloudHeight: params.cloudHeight,
-                        length: dim * 0.04,
                         scale: params.scale,
                     });
-
-                    p5.fill(0);
-                    p5.ellipse(px, py, 20, 20);
                 }
             }
 
@@ -76,27 +73,35 @@ window.addEventListener('load', function () {
             const {
                 startX,
                 startY,
-                amplitude,
-                length,
                 cloudWidth,
                 cloudHeight,
-                scale
+                scale,
+                amplitude,
             } = options;
 
-            const calcVScale = (x, i, amp) => {
-                return x - amp * p5.noise(i + x * amp);
-            }
 
-            const radius = length;
             const eHeight = cloudHeight * scale;
             const eWidth = cloudWidth * scale;
+
+            function startCloud(startPos, length, dirFun) {
+                return function(circlePos) {
+                    return startPos(circlePos) + length * dirFun(circlePos);
+                }
+            }
+
+            const calcPosX = startCloud((pos) => {
+                return startX - (scale * amplitude * Math.cos(pos) * p5.noise(Math.cos(pos) + 1, Math.sin(pos) + 1, params.randomize ? startX * p5.noise(startX) : pos));
+            }, eWidth, Math.cos);
+            const calcPosY = startCloud((pos) => {
+                return startY - (scale * amplitude * Math.sin(pos) * p5.noise(Math.cos(pos) + 1, Math.sin(pos) + 1, params.randomize ? startY * p5.noise(startY): pos));
+            }, eHeight, Math.sin);
+
             // Cloud shape
             p5.beginShape();
-            for (let i = 0; i < 2 * p5.PI; i += 0.01) {
-                p5.vertex(eWidth * Math.cos(i) + calcVScale(startX, i, amplitude), eHeight * Math.sin(i) + calcVScale(startY, i, amplitude));
+            for (let i = 0; i < p5.TWO_PI; i += 0.01) {
+                p5.vertex(calcPosX(i), calcPosY(i));
             }
-            p5.vertex(eWidth * Math.cos(0) + calcVScale(startX, 0, amplitude), eHeight * Math.sin(0) + calcVScale(startY, 0, amplitude));
-            p5.endShape();
+            p5.endShape(p5.CLOSE);
         }
     }
 
