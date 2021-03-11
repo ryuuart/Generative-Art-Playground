@@ -15,6 +15,9 @@ window.addEventListener('load', function () {
         amplitude: 1,
         randomize: true,
         diff: 10,
+        fileName: 'clouds',
+        save: function() {
+        },
     }
 
     gui.add(params, 'cloudWidth', 0, 50);
@@ -25,18 +28,27 @@ window.addEventListener('load', function () {
     gui.add(params, 'gridHeight', 0, 50, 1);
     gui.add(params, 'randomize');
 
+
     const randomizeFolder = gui.addFolder('Randomize Only');
     randomizeFolder.add(params, 'diff', 0, 100);
+
+    const saveFolder = gui.addFolder('Save');
+    saveFolder.add(params, 'fileName');
+    saveFolder.add(params, 'save');
 
     const sketch = (p5) => {
         // Create a new canvas to browser size
         p5.setup = function() {
-            p5.createCanvas(p5.windowWidth, p5.windowHeight);
+            const canvas = p5.createCanvas(p5.windowWidth, p5.windowHeight, p5.Renderer);
+
+            params.save = function() {
+                p5.save(canvas, params.fileName ? params.fileName : 'clouds', 'png');
+            }
         }
 
         // When the browser window resizes, resize the canvas too
         p5.windowResized = function() {
-            resizeCanvas(p5.windowWidth, p5.windowHeight);
+            p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
         }
 
         // Render loop
@@ -70,9 +82,8 @@ window.addEventListener('load', function () {
                     });
                 }
             }
-
         }
-
+ 
         function printCloud(options) {
             const {
                 startX,
