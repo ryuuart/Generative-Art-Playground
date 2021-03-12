@@ -18,6 +18,10 @@ window.addEventListener('load', function () {
         fileName: 'clouds',
         save: function() {
         },
+        bgColor: '#FFFFFF',
+        cloudColor: '#FFFFFF',
+        strokeColor: '#000000',
+        strokeWeight: 1,
     }
 
     gui.add(params, 'cloudWidth', 0, 50);
@@ -36,9 +40,19 @@ window.addEventListener('load', function () {
     saveFolder.add(params, 'fileName');
     saveFolder.add(params, 'save');
 
+    const styleFolder = gui.addFolder('Styling');
+    styleFolder.add(params, 'strokeWeight', 0, 25);
+
+    const colorFolder = styleFolder.addFolder('Color');
+    colorFolder.addColor(params, 'bgColor');
+    colorFolder.addColor(params, 'cloudColor');
+    colorFolder.addColor(params, 'strokeColor');
+
     const sketch = (p5) => {
         // Create a new canvas to browser size
         p5.setup = function() {
+            p5.pixelDensity(2);
+
             const canvas = p5.createCanvas(p5.windowWidth, p5.windowHeight, p5.Renderer);
 
             params.save = function() {
@@ -58,8 +72,11 @@ window.addEventListener('load', function () {
 
             const margin = dim * 0.2;
 
-            // white background
-            p5.background(255);
+            // Set up styling
+            p5.background(params.bgColor);
+            p5.fill(params.cloudColor);
+            p5.stroke(params.strokeColor);
+            p5.strokeWeight(params.strokeWeight);
 
             const innerWidth = p5.width - margin * 2;
 
